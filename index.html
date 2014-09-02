@@ -1,9 +1,42 @@
-<html>
-<h1>opac</h1>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>簡単なOPAC</title>
+  </head>
+  <body>
+    <h2>検索フォーム</h2>
 
-<form method="post" action="opac.cgi">
-<p><input type="text" name="keyword" size="50"></p>
-<p><input type="submit" value="GO" ></p>
-</form>
-
+    <form method="post" action="opac.cgi">
+      <p><input type="text" name="keyword" size="50">
+      <input type="submit" value="GO" ></p>
+    </form>
+    <p>キーワードをすべての項目から検索します。なにも入力しなければ一覧を表示します。</p>
+    <hr>
+    <h2>追加フォーム</h2>
+    <form method="post" action="add.cgi">
+      <p>ISBN<input type="text" name="isbn" size="50"></p>
+      <p>Title<input type="text" name="title" size="50"></p>
+      <p>Au<input type="text" name="author" size="50"></p>
+      <p>pub<input type="text" name="pub" size="50"></p>
+      <p>year<input type="text" name="pubyear" size="50"></p>
+      <p>url<input type="text" name="url" size="50"></p>
+      <p>issn<input type="text" name="issn" size="50"></p>
+      <input type="submit" value="ADD"></p>
+    </form>
+    <p>空白は空白のまま追加</p>
+    <hr>
+    <h2>削除フォーム</h2>
+    <form method="post" action="del.cgi">
+      <p>ISBN<input type="text" name="isbn" size="50"></p>
+      <p>Title<input type="text" name="title" size="50"></p>
+      <p>Au<input type="text" name="author" size="50"></p>
+      <p>pub<input type="text" name="pub" size="50"></p>
+      <p>year<input type="text" name="pubyear" size="50"></p>
+      <p>url<input type="text" name="url" size="50"></p>
+      <p>issn<input type="text" name="issn" size="50"></p>
+      <input type="submit" value="DELETE"></p>
+    </form>
+    <p>完全に一致した項目が含まれる行を削除します</p>
+  </body>
 </html>
