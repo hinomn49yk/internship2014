@@ -11,21 +11,24 @@ imap.authenticate('PLAIN','a013148','NIMS392!')
 imap.examine('INBOX')
 imap.search(["TO","SEKINE"]).each do |message_id|
   #puts last_uid = imap.status('INBOX', ["MESSAGES"])["MESSAGES"]
-  puts message_id
+  #puts message_id
   envelope = imap.fetch(message_id, "ENVELOPE")[0].attr["ENVELOPE"] 
-  body = imap.fetch(message_id, "BODY[TEXT]")[0].attr["BODY[TEXT]"].encode("UTF-8", "ISO-2022-JP")
   sender = envelope.sender[0].mailbox
+  #body = imap.fetch(message_id, "BODY[TEXT]")[0].attr["BODY[TEXT]"].encode("UTF-8", "ISO-2022-JP")
+  body = imap.fetch(message_id, "BODY[TEXT]")[0].attr["BODY[TEXT]"]
+  body = NKF.nkf("-w",body)
   date = envelope.date
   subject = envelope.subject
-  puts NKF.nkf("-w",subject)
+  subject = NKF.nkf("-w",subject)
 #raise subject.encoding.to_s
-  # "送信者: #{sender}" 
-  #puts "送信#{date}"
-  #puts "件名: #{subject}"
-  #puts "本文:\n#{body} "
+  puts "#{message_id}"
+  puts "送信者: #{sender}" 
+  puts "送信日時#{date}"
+  puts "件名: #{subject}"
+  puts "本文:\n#{body} "
   #db = SQLite3::Database.new("mail.db")
   #db.transaction{
-   # db.execute("insert into mailbox values(?, ?, ?, ?, ?);", message_id, sender, date, subject, body)
+  #  db.execute("insert into mailbox values(?, ?, ?, ?, ?);", message_id, sender, date, subject, body)
   #}
 end
   #db = SQLite3::Database.new("test.db")

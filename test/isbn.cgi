@@ -15,20 +15,12 @@ print "<form action=\"search.cgi\" method=\"get\"><p><input type=\"search\" name
 
 
 cgi = CGI.new
-order = cgi["order"]
+isbn = cgi["isbn"]
+issn = cgi["issn"]
 
-if order == "" 
-  order = "desc"
-end
 
-print "<form action=\"mailbox.cgi\" method=\"post\"><select name=\"order\">"
-if order == "desc"
-  print "<option value=\"desc\" selected>新しい順</option><option value=\"asc\">古い順</option>"
-else
-  print "<option value=\"desc\">新しい順</option><option value=\"asc\" selected>古い順</option>"
-end
-print "<input type=\"submit\" value=\"並び替え\"></form>"
 
+=begin
 db = SQLite3::Database.new("mail.db")
 db.transaction{
   puts "<table border = 1>"
@@ -39,4 +31,5 @@ db.transaction{
 }
 puts "</table>"
 print "<p></p>\n"
+=end
 print "</body></html>"
