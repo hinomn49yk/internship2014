@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # -*- coding: utf-8 -*-
-require "cgi"
 require "sqlite3"
+require "cgi"
 require "isbn"
 print "Content-type: text/html\n\n"
 
