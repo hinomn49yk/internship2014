@@ -3,20 +3,56 @@
 require "open-uri"
 require 'rexml/document'
 require 'nokogiri'
-url = "http://worldcat.org/isbn/4101010056"
+require 'json'
 
-#doc = Nokogiri::HTML(open("http://worldcat.org/issn/13486780"))
+ 
+#uri = open("http://worldcat.org/issn/13486780").base_uri
+uri = open("http://worldcat.org/issn/09280987").base_uri
+#uri = open("http://worldcat.org/isbn/4101010056").base_uri
+# uri.path = "/title/sorekara/oclc/25663089"
+column = uri.path.split(/\//)
+oclcnum = column[-1]
 
-doc = Nokogiri::HTML.parse(open("http://worldcat.org/isbn/4101010056"))
-puts doc.title
-doc.xpath('//div[]').each do |node|
-  p node.xpath('//div').text  
-end
+#p uri = "http://www.worldcat.org/oclc/" + "#{oclcnum}" + ".jsonld"
+ur = "http://www.worldcat.org/oclc/" + "#{oclcnum}"
+#p uri = ur + ".nt" # nt
+uri = ur + ".rdf"
+doc = Nokogiri::XML(open(uri).read)
+namespaces = {  
+  "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#", 
+  "xmlns:library" => "http://purl.org/library/",
+  "xmlns:j.0" => "http://www.w3.org/2006/gen/ont#",
+  "xmlns:owl" => "http://www.w3.org/2002/07/owl#",
+  "xmlns:dcterms" => "http://purl.org/dc/terms/",
+  "xmlns:xsd" => "http://www.w3.org/2001/XMLSchema#", 
+  "xmlns:void" => "http://rdfs.org/ns/void#", 
+  "xmlns:schema" => "http://schema.org/"
+}
 
+puts doc.xpath("//rdf:Description[@rdf:about='#{ur}']/schema:name", namespaces).text
+
+#p uri = "http://www.worldcat.org/oclc/" + "#{oclcnum}" + ".jsonld"
 =begin
-<div id="bibdata">
+<http://www.worldcat.org/oclc/25663089> <http://schema.org/name> "それから"
+json = open(uri).read
+test = JSON.parse(json)
+=begin
+require 'net/http'
+proxy_class = Net::HTTP::Proxy('wwwout.nims.go.jp', 8888)
+res = proxy_class.start('komorido.nims.go.jp'){| http |
+  # proxy.example.com 経由で接続します。
+  puts "a"
+  p http
+#  http.get('/~a013148/index.html/')
+}
+#puts res.body
+#
+#Net::HTTP.get_print 'http://worldcat.org', '/issn/13486780'
 
-	<h1 class="title"><div class=vernacular lang="ja">それから /</div>
+#doc = Nokogiri::HTML.parse(open("http://worldcat.org/isbn/4101010056"))
+#doc = Nokogiri::HTML(open("http://worldcat.org/issn/13486780"))
+#puts doc.title
+
 #namespaces = {  
 #  "xmlns" => "http://www.w3.org/2005/Atom", 
 #  "xmlns:dc" => "http://purl.org/dc/elements/1.1/",
