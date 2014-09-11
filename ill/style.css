@@ -1,0 +1,32 @@
+@charset "utf-8";
+
+table {
+	margin: 2em;
+	padding: 0;
+	border-collapse: collapse;
+	empty-cells: hide;
+}
+
+tr * {
+	padding: 0.5em 1em 0.5em 1em;
+	text-align: left;
+}
+
+th {
+	background-color: #ffb77a;
+	text-align: left;
+}
+
+tr *:nth-child() {
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	width: 8em;
+}
+
+tbody tr:nth-child(even) td {
+	background-color: #ffefe1;
+}
+
+tbody tr:nth-child(odd) td {
+	background-color: #ffffff;
+}

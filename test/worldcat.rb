@@ -5,7 +5,7 @@ require 'rexml/document'
 require 'nokogiri'
 require 'json'
 
- 
+issn = "00153230" 
 #uri = open("http://worldcat.org/issn/13486780").base_uri
 uri = open("http://worldcat.org/issn/09280987").base_uri
 #uri = open("http://worldcat.org/isbn/4101010056").base_uri

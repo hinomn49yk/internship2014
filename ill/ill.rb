@@ -6,6 +6,8 @@ require 'kconv'
 require "sqlite3"
 require 'base64'
 require 'nkf'
+require 'time'
+
 imap = Net::IMAP.new('ahaya.nims.go.jp')
 
 imap.authenticate('PLAIN','a013148','NIMS392!')
@@ -18,16 +20,19 @@ imap.search(["TO","ILL"]).each do |message_id|
   #body = imap.fetch(message_id, "BODY[TEXT]")[0].attr["BODY[TEXT]"].encode("UTF-8", "ISO-2022-JP")
   body = imap.fetch(message_id, "BODY[TEXT]")[0].attr["BODY[TEXT]"]
   body = NKF.nkf("-wmQ",body) #quoted-printableでデコードする
-  date = envelope.date
+  date = envelope.date #=> Wed, 03 Sep 2014 14:08:48 +0900
+  date = Time.parse(date).to_s     #=> 2014-09-11 09:02:09 +0900 
   subject = envelope.subject
   subject = NKF.nkf("-w",subject)
+  subjects = subject.split()
+  mailnum = subjects[-1]
 #raise subject.encoding.to_s
   #"#{message_id}"
   #"送信者: #{sender}" 
   #"送信日時#{date}"
   #puts "件名: #{subject}"
   #"本文:\n#{body} "
-  mailnum = message_id.to_s
+  #mailnum = message_id.to_s
   profile = Array.new
   record = Hash.new("") #デフォルト値を設定しておく（あとでDBに格納するときのために））
   records = Array.new 
@@ -77,14 +82,14 @@ imap.search(["TO","ILL"]).each do |message_id|
       record.store("note", $1) 
     end
   end 
-  #1件のときはそのレコードを、2件以上のときの最後のレコードをハッシュに格納
+  #1件のときはそのレコードを、2件以上のときの最後のレコードを配列に格納
   records[$num - 1] = record
  
   db = SQLite3::Database.new("ill.db")
   db.transaction{
     i = 0
     while i < $num
-      illnum = mailnum + "_" + (i + 1).to_s
+      illnum = mailnum + "-" + (i + 1).to_s
       db.execute "INSERT OR IGNORE INTO illrecord
         (illnum, date, site, department, name, tell, email, code, budget_code, budget_name,
          title, vol_no, pages, year, author,article, issn, isbn, note) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
