@@ -10,10 +10,10 @@ print "<html lang=\"ja\">"
 
 cgi = CGI.new
 illnum = cgi['illnum']
-
+illstatus = cgi['illstatus']
 db = SQLite3::Database.new("ill.db")
 db.transaction{
-rows = db.execute("select * from illrecord where illnum =\"#{illnum}\";") {|row| 
+  rows = db.execute("select * from illrecord where illnum = \"#{illnum}\";") {|row| 
     print (<<-"HEAD")
     <head>
     <meta charset="utf-8">
@@ -25,6 +25,11 @@ rows = db.execute("select * from illrecord where illnum =\"#{illnum}\";") {|row|
     puts "<body>" 
     puts "<p><h2>#{row[10]}</h2></p><hr>"
     puts "<form action=\"status.cgi\" method=\"get\"><input type=\"text\" name=\"illstatus\" size=\"20\"><input type=\"hidden\" name=\"illnum\" value=\"#{row[0]}\"><input type=\"submit\" value=\"状態変更\"></form>"
+    
+  db.execute "UPDATE illstatus SET status = \"#{illstatus}\" WHERE illnum = \"#{illnum}\""
+  db.execute("select * from illstatus where illnum = \"#{illnum}\";"){| row |
+    puts row
+  }
     printf("<table><tr><td><br></td></tr>
 <tr><td>通し番号</td><td>%s</td></tr>
 <tr><td>受付日時</td><td>%s</td></tr>

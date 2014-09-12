@@ -11,8 +11,8 @@ require 'time'
 imap = Net::IMAP.new('ahaya.nims.go.jp')
 
 imap.authenticate('PLAIN','a013148','NIMS392!')
-imap.examine('ILL')
-imap.search(["TO","ILL"]).each do |message_id|
+imap.examine('INBOX') #INBOX,ILL
+imap.search(["TO","ILL"]).each do |message_id| 
   #puts last_uid = imap.status('INBOX', ["MESSAGES"])["MESSAGES"]
   #puts message_id
   envelope = imap.fetch(message_id, "ENVELOPE")[0].attr["ENVELOPE"] 
@@ -21,7 +21,9 @@ imap.search(["TO","ILL"]).each do |message_id|
   body = imap.fetch(message_id, "BODY[TEXT]")[0].attr["BODY[TEXT]"]
   body = NKF.nkf("-wmQ",body) #quoted-printableでデコードする
   date = envelope.date #=> Wed, 03 Sep 2014 14:08:48 +0900
-  date = Time.parse(date).to_s     #=> 2014-09-11 09:02:09 +0900 
+  date = Time.parse(date)     #=> 2014-09-11 09:02:09 +0900 
+  year = date.year.to_s
+  date = date.to_s
   subject = envelope.subject
   subject = NKF.nkf("-w",subject)
   subjects = subject.split()
@@ -49,7 +51,7 @@ imap.search(["TO","ILL"]).each do |message_id|
       profile << $1
     when /\[E-mail\](.*)/
       profile << $1
-    when /\[引き落とし先 配算体コード\](.*)/
+    when /\[引落し先 配算体コード\](.*)/
       profile << $1
     when /\[予算科目コード（数字10桁）\](.*)/
       profile << $1
@@ -88,13 +90,17 @@ imap.search(["TO","ILL"]).each do |message_id|
   db = SQLite3::Database.new("ill.db")
   db.transaction{
     i = 0
+    t = Time.now
     while i < $num
-      illnum = mailnum + "-" + (i + 1).to_s
+      illnum = mailnum + "-" + (i + 1).to_s + "-" + year
       db.execute "INSERT OR IGNORE INTO illrecord
         (illnum, date, site, department, name, tell, email, code, budget_code, budget_name,
          title, vol_no, pages, year, author,article, issn, isbn, note) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
         [illnum, date, profile[0], profile[1], profile[2], profile[3], profile[4], profile[5], profile[6], profile[7],
         records[i]["title"], records[i]["vol_no"], records[i]["pages"], records[i]["year"], records[i]["author"], records[i]["article"], records[i]["issn"], records[i]["isbn"], records[i]["note"]]
+
+      db.execute "INSERT OR IGNORE INTO illstatus (illnum) VALUES(?);", [illnum]
+
       i += 1
     end
   } 
