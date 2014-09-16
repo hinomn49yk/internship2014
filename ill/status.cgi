@@ -11,6 +11,8 @@ print "<html lang=\"ja\">"
 cgi = CGI.new
 illnum = cgi['illnum']
 illstatus = cgi['illstatus']
+fees = cgi['fees']
+library = cgi['library']
 db = SQLite3::Database.new("ill.db")
 db.transaction{
   rows = db.execute("select * from illrecord where illnum = \"#{illnum}\";") {|row| 
@@ -21,17 +23,34 @@ db.transaction{
     <link rel="stylesheet" href="style.css">
     </head>\n
     HEAD
-    puts"<a href=\"illmanager.cgi\">受信トレイに戻る</a>"
-    puts "<body>" 
+    puts "<body>"
+    puts "<a href=\"illmanager.cgi\">受信トレイに戻る</a>"
     puts "<p><h2>#{row[10]}</h2></p><hr>"
     puts "<form action=\"status.cgi\" method=\"get\"><input type=\"text\" name=\"illstatus\" size=\"20\"><input type=\"hidden\" name=\"illnum\" value=\"#{row[0]}\"><input type=\"submit\" value=\"状態変更\"></form>"
+    t = Time.new
+    if illstatus.empty?  
+    else 
+      db.execute "UPDATE illstatus SET status = \"#{illstatus}\" WHERE illnum = \"#{illnum}\""
+      db.execute "UPDATE illstatus SET date = \"#{t.to_s}\" WHERE illnum = \"#{illnum}\"" 
+    end
     
-  db.execute "UPDATE illstatus SET status = \"#{illstatus}\" WHERE illnum = \"#{illnum}\""
-  db.execute("select * from illstatus where illnum = \"#{illnum}\";"){| row |
-    puts row
-  }
-    printf("<table><tr><td><br></td></tr>
-<tr><td>通し番号</td><td>%s</td></tr>
+    if fees.empty?  ; else db.execute "UPDATE illstatus SET fees = \"#{fees}\" WHERE illnum = \"#{illnum}\"" end
+    if library.empty?  ; else db.execute "UPDATE illstatus SET library = \"#{library}\" WHERE illnum = \"#{illnum}\"" end
+ 
+    db.execute("select * from illstatus where illnum = \"#{illnum}\";"){| row |
+      puts row
+    }
+    puts("<table><tr><td><br></td></tr>")
+    db.execute("select * from illstatus where illnum = \"#{row[0]}\";"){| row |
+      puts("<tr><td>ILL状態</td><td>#{row[1]}</td>")
+      puts("<tr><td>変更日付</td><td>#{row[2]}</td>")
+      puts("<tr><td>依頼した図書館</td><td>#{row[3]}</td>")
+      puts("<tr><td>複写料金</td><td>#{row[4]}</td>")
+
+    }
+
+
+    printf("<tr><td>通し番号</td><td>%s</td></tr>
 <tr><td>受付日時</td><td>%s</td></tr>
 <tr><td>[所属地区]</td><td>%s</td></tr>
 <tr><td>[所属]</td><td>%s</td></tr>
