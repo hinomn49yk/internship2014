@@ -12,7 +12,7 @@ imap = Net::IMAP.new('ahaya.nims.go.jp')
 
 imap.authenticate('PLAIN','a013148','NIMS392!')
 imap.examine('INBOX') #INBOX,ILL
-imap.search(["TO","ILL"]).each do |message_id| 
+imap.search(["TO", "ILL", "SUBJECT", "NIMS" ]).each do |message_id| 
   #puts last_uid = imap.status('INBOX', ["MESSAGES"])["MESSAGES"]
   #puts message_id
   envelope = imap.fetch(message_id, "ENVELOPE")[0].attr["ENVELOPE"] 
@@ -86,7 +86,11 @@ imap.search(["TO","ILL"]).each do |message_id|
   end 
   #1件のときはそのレコードを、2件以上のときの最後のレコードを配列に格納
   records[$num - 1] = record
- 
+  
+  
+  profile.map!{|r| r.strip!} #前後の空白を消す
+  records.map{|record| record.values.map!{|r| r.strip!}}
+
   db = SQLite3::Database.new("ill.db")
   db.transaction{
     i = 0

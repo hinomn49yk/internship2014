@@ -15,14 +15,13 @@ print (<<"HEAD")
 </head>\n
 HEAD
 
-print "<body><h1><a href=\"illmanager.cgi\">ILL Manager</a></h1>\n"
-
+puts "<body><h1><a href=\"illmanager.cgi\">ILL Manager</a></h1>"
 
 
 cgi = CGI.new
 order = cgi["order"]
 query = cgi["query"]
-print "<form action=\"illmanager.cgi\" method=\"get\"><p><input type=\"search\" name=\"query\" size=\"50\" value=\"#{query}\"><input type=\"submit\" value=\"検索\"></form>"
+puts "<form action=\"illmanager.cgi\" method=\"get\"><p><input type=\"search\" name=\"query\" size=\"50\" value=\"#{query}\"><input type=\"submit\" value=\"検索\"></form>"
 
 if order == "" 
   order = "desc"
@@ -34,6 +33,9 @@ else
   print "<option value=\"desc\">新しい順</option><option value=\"asc\" selected>古い順</option>"
 end
 puts "<input type=\"submit\" value=\"並び替え\"></form>"
+
+
+
 
 if query.empty?
   sql = "select * from illrecord order by date #{order};"
@@ -52,7 +54,7 @@ db.transaction{
     }
     # 依頼情報を表示
     printf("<td>%s</td><td>%s</td><td>%s, %s</td><td>%s</td><td>%s</td>
-<td><form action=\"detail.cgi\" method=\"get\"><input type=\"submit\" value=\"%s\"><input type=\"hidden\" name=\"illnum\" value=\"%s\"></form></td>",
+<td><form action=\"status.cgi\" method=\"get\"><input type=\"submit\" value=\"%s\"><input type=\"hidden\" name=\"illnum\" value=\"%s\"></form></td>",
 row[0], row[1], row[2], row[3], row[4], row[6], row[10], row[0])
   issn = row[16]
   isbn = row[17]
