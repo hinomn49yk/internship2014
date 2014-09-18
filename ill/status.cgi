@@ -3,6 +3,9 @@
 require 'cgi'
 require 'sqlite3'
 require 'library_stdnums'
+require './ciniisearch'
+
+
 print "Content-type: text/html\n\n"
 
 
@@ -142,7 +145,9 @@ db.transaction{
       elsif isbn.empty?
         if StdNum::ISSN.valid?(issn)
           puts "<p>#{issn} has a valid checkdigit</p>"
-       
+          #puts ciniiissn(issn)
+          
+          
           cinii = "http://ci.nii.ac.jp/books/search?issn=#{issn}"
           wc = "http://www.worldcat.org/search?q=n2:#{issn}"
           ndl = "https://ndlopac.ndl.go.jp/F/ILDAH8NLF7RV3YQIBBU8DLD32SQ5Q4JBKHT3VMFSD5G2HIFG3C-44349?func=find-a&find_code=WTYP&request=&request_op=AND&find_code=WRD&request=&request_op=AND&find_code=ISSN&request=#{issn}&request_op=AND&find_code=WAU&request=&request_op=AND&find_code=WPU&request=&request_op=AND&find_code=CALL&request=&request_op=AND&find_code=&request=&request_op=AND&find_code=&request=&request_op=AND&find_code=&request=&chk_bigram=on&adjacent=N&chk_all=on&chk_fmt_BK=on&chk_fmt_SE=on&chk_fmt_WZ=on&chk_fmt_EL=on&chk_fmt_WK=on&chk_fmt_HA=on&chk_fmt_MP=on&chk_fmt_MI=on&chk_fmt_AC=on&chk_fmt_ZK=on&chk_fmt_KT=on&filter_code_4=WSL&filter_request_4=&filter_code_2=WYR&filter_request_2=&filter_code_3=WYR&filter_request_3=&filter_code_1=WLNT&filter_request_1=&x=71&y=7"
@@ -156,6 +161,7 @@ db.transaction{
     puts "<p><a href=\"#{wc}\" target=\"_blank\">WorldCat</a></p>"
     puts "<p><a href=\"#{ndl}\" target=\"_blank\">NDL-OPAC</a></p>"
     puts "<p><a href=\"#{iss}\" target=\"_blank\">国立国会図書館サーチ</a></p>"
+
   }
 }
 
