@@ -7,17 +7,24 @@ require "sqlite3"
 require 'base64'
 require 'nkf'
 require 'time'
+require 'yaml'
 
-imap = Net::IMAP.new('ahaya.nims.go.jp')
+io = File.open("user.yaml", "r")
+yaml = YAML.load(io)
+io.close
 
-imap.authenticate('PLAIN','a013148','NIMS392!')
+
+imap = Net::IMAP.new("#{yaml['server']}")
+
+imap.authenticate("PLAIN", "#{yaml['user']}", "#{yaml['pin']}")
 imap.examine('INBOX') #INBOX,ILL
-imap.search(["TO", "ILL", "SUBJECT", "NIMS" ]).each do |message_id| 
+# ASCII以外はだめか↓
+imap.search(["TO", "ILL", "SUBJECT", "NIMS"]).each do |message_id| 
   #puts last_uid = imap.status('INBOX', ["MESSAGES"])["MESSAGES"]
-  #puts message_id
+  
   envelope = imap.fetch(message_id, "ENVELOPE")[0].attr["ENVELOPE"] 
   sender = envelope.sender[0].mailbox
-  #body = imap.fetch(message_id, "BODY[TEXT]")[0].attr["BODY[TEXT]"].encode("UTF-8", "ISO-2022-JP")
+  
   body = imap.fetch(message_id, "BODY[TEXT]")[0].attr["BODY[TEXT]"]
   body = NKF.nkf("-wmQ",body) #quoted-printableでデコードする
   date = envelope.date #=> Wed, 03 Sep 2014 14:08:48 +0900
@@ -36,7 +43,8 @@ imap.search(["TO", "ILL", "SUBJECT", "NIMS" ]).each do |message_id|
   #"本文:\n#{body} "
   #mailnum = message_id.to_s
   profile = Array.new
-  record = Hash.new("") #デフォルト値を設定しておく（あとでDBに格納するときのために））
+  # ハッシュにデフォルト値を設定しておく（あとでDBに格納するときのために）
+  record = Hash.new("") 
   records = Array.new 
   body.each_line do |line|
     line.chomp!
@@ -87,8 +95,8 @@ imap.search(["TO", "ILL", "SUBJECT", "NIMS" ]).each do |message_id|
   #1件のときはそのレコードを、2件以上のときの最後のレコードを配列に格納
   records[$num - 1] = record
   
-  
-  profile.map!{|r| r.strip!} #前後の空白を消す
+  # 前後の空白を消す
+  profile.map!{|r| r.strip!}
   records.map{|record| record.values.map!{|r| r.strip!}}
 
   db = SQLite3::Database.new("ill.db")
