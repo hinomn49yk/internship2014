@@ -3,7 +3,7 @@
 require 'cgi'
 require 'sqlite3'
 require 'library_stdnums'
-require './ciniisearch'
+#require './ciniisearch'
 
 
 print "Content-type: text/html\n\n"
@@ -145,7 +145,7 @@ db.transaction{
       elsif isbn.empty?
         if StdNum::ISSN.valid?(issn)
           puts "<p>#{issn} has a valid checkdigit</p>"
-          #puts ciniiissn(issn)
+
           
           
           cinii = "http://ci.nii.ac.jp/books/search?issn=#{issn}"
