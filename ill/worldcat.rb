@@ -7,13 +7,13 @@ require 'json'
 require './illconfig'
 
 def worldcatsearch(issn)
-  oclc_uri = open("http://worldcat.org/issn/#{issn}", proxy: IllConfig.config["proxy_server"]).base_uri
+  oclc_uri = open("http://worldcat.org/issn/#{issn}", proxy: IllConfig.config["proxy_server_url"]).base_uri
   column = oclc_uri.path.split(/\//)
   oclcnum = column[-1]
   
   ur = "http://www.worldcat.org/oclc/" + "#{oclcnum}"
   uri = ur + ".rdf"
-  doc = Nokogiri::XML(open(uri, proxy: IllConfig.config["proxy_server"]).read)
+  doc = Nokogiri::XML(open(uri, proxy: IllConfig.config["proxy_server_url"]).read)
   namespaces = {  
     "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#", 
     "xmlns:library" => "http://purl.org/library/",
@@ -29,6 +29,9 @@ def worldcatsearch(issn)
   result
 end
 
-p worldcatsearch("4101010056")
+
+
+
+#p worldcatsearch("0950-0618")
 # uri.path = "/title/sorekara/oclc/25663089"
 

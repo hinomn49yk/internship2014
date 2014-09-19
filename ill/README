@@ -1,0 +1,62 @@
+文献複写依頼を管理するためのシステム
+プログラミング言語はRubyである。
+
+
+
+illmanager.cgi 
+本システムのトップ画面
+データベースからデータを取り出し、一覧表示する
+人名検索
+
+1件毎にstatus.cgi（詳細画面）へリンクが付いており、illnumを送ることで詳細表示を可能にしている。
+人名検索について。query
+
+status.cgi
+一覧画面で選んだ1件のみを表示する
+詳細情報を表示する
+また、ILL状態の変更、依頼した図書館の変更、複写料金の入力を行うフォームもある
+
+excsv.cgi
+プログラム名は、EXport CSVとなっているが、実際はTSV形式のファイルを出力する
+status.cgiから1件のみのCSVを出力する
+illmanager.cgiからは全件または
+
+
+ill.db
+illrecord, illstatus, libraries, falibの4つのテーブルをもつ
+スキーマは以下の通り。
+CREATE TABLEillrecord (illnum text primary key, date text, site text ,department text, name text, tell text, email text, code text, budget_code text, budget_name text, title text, vol_no text, pages text, year text, author text, article text, issn text, isbn text, note text);
+CREATE TABLE illstatus (illnum text primary key, status text, date text, libnum integer, fees int, fanum text);
+CREATE TABLE libraries (isil text primary key, name_jp text, name_en text, kana text, postal_code text, prefecture text, city text, address text, telephone text, fax text, url text, former_isil text);
+CREATE TABLE falib (fanum text primary key, name text);
+
+illrecordの主キーに、メールの件名の末尾の通し番号に、件数、その年をあわせて、xxx-1-2014となっているが、主キーだが、もし2015年の1,2,3月に、xxx-1-2015となり、4月に1から始まる場合、xxx-1-2015が再び現れて、主キーの制約でDBに格納できなくなるという問題がある。
+
+
+
+librariesテーブルは使用していない。
+
+ill.rb
+メールを読み込んで、データベースに格納するプログラム
+
+
+worldcat.rb
+WorldCatで検索するプログラム。メソッドworldcatsearch()は引数にISSNをとる。ISSNはハイフンが入っていてもいなくてもよい。
+
+
+ciniisearch.rb
+CiNiiで検索するプログラム
+
+
+
+
+
+
+作成日2014/09/19
+--------------------
+筑波大学情報学群
+知識情報・図書館学類3年
+関根吉紀
+Sekine Yoshiki
+s1211512@u.tsukuba.ac.jp
+--------------------

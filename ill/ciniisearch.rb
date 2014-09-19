@@ -3,6 +3,7 @@
 require "open-uri"
 require 'rexml/document'
 require 'nokogiri'
+require './illconfig'
 
 #doc = Nokogiri::XML(xml)
 #doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?issn=13486780"))
@@ -10,7 +11,7 @@ require 'nokogiri'
 
 
 def cinii_issn(issn)
-  doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?issn=#{issn}", proxy: "http://wwwout.nims.go.jp:8888"))
+  doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?issn=#{issn}", proxy: IllConfig.config["proxy_server_url"]))
   namespaces = {
     "xmlns" => "http://www.w3.org/2005/Atom", 
     "xmlns:dc" => "http://purl.org/dc/elements/1.1/",
@@ -34,7 +35,7 @@ def cinii_issn(issn)
 end
 
 def cinii_isbn(isbn)
-  doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?isbn=#{isbn}", proxy: "http://wwwout.nims.go.jp:8888"))
+  doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?isbn=#{isbn}", proxy: IllConfig.config["proxy_server_url"]))
 
   namespaces = {
     "xmlns" => "http://www.w3.org/2005/Atom", 

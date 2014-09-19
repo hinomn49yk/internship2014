@@ -28,6 +28,7 @@ db.transaction{
     <html lang=\"ja\">
     <head>
     	<meta charset="utf-8">
+	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     	<title>#{row['title']}</title>
     	<link rel="stylesheet" href="style.css">
     </head>\n
@@ -135,8 +136,14 @@ db.transaction{
         end
       elsif isbn.empty?
         if StdNum::ISSN.valid?(issn)
-          puts "<p>#{issn} has a valid checkdigit</p>"
-          p cinii_issn(issn)
+          puts "<h3>#{issn} has a valid checkdigit</h3>"
+          puts "<table><tr><th><br></th><th>CiNii検索結果</th></tr>"
+          cinii_issn(issn).each{| arr | arr.each{| key, value |
+            puts "<tr><td>#{key}</td><td>#{value}</td></tr>"
+          }}
+          puts "</table>"
+	  puts "<div id=\"list\">Worldcatを検索しています</div>"
+	  puts "<script>$(\"#list\").load(\"./worldcat.cgi?issn=#{issn} #content\");</script>"
           puts "<br>"
           
           cinii = "http://ci.nii.ac.jp/books/search?issn=#{issn}"
