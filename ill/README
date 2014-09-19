@@ -32,9 +32,11 @@ CREATE TABLE falib (fanum text primary key, name text);
 
 illrecordの主キーに、メールの件名の末尾の通し番号に、件数、その年をあわせて、xxx-1-2014となっているが、主キーだが、もし2015年の1,2,3月に、xxx-1-2015となり、4月に1から始まる場合、xxx-1-2015が再び現れて、主キーの制約でDBに格納できなくなるという問題がある。
 
+illrecordテーブルはメールから抽出したのデータを格納している。
+librariesテーブルは使用していないが、ISILのデータが格納してある。
+illstatusテーブルは、status.cgiでフォームから入力したデータを挿入、更新する。
+falibはFA番号と図書館が格納しているが、まだ未完成である。
 
-
-librariesテーブルは使用していない。
 
 ill.rb
 メールを読み込んで、データベースに格納するプログラム
@@ -47,16 +49,30 @@ WorldCatで検索するプログラム。メソッドworldcatsearch()は引数�
 ciniisearch.rb
 CiNiiで検索するプログラム
 
+The MIT License (MIT)
 
+Copyright (c) 2014 Yoshiki Sekine
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 作成日2014/09/19
---------------------
-筑波大学情報学群
-知識情報・図書館学類3年
-関根吉紀
+-------------------
 Sekine Yoshiki
 s1211512@u.tsukuba.ac.jp
 --------------------
