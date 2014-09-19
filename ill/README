@@ -19,7 +19,7 @@ status.cgi
 excsv.cgi
 プログラム名は、EXport CSVとなっているが、実際はTSV形式のファイルを出力する
 status.cgiから1件のみのCSVを出力する
-illmanager.cgiからは全件または
+illmanager.cgiからは全件または検索でヒットしたものを出力する
 
 
 ill.db
