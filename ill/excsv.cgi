@@ -9,15 +9,20 @@ print "Content-type: text/csv; charset=Shift_JIS\n\n"
 
 cgi = CGI.new
 illnum = cgi['illnum']
+sql = cgi['sql']
 
 db = SQLite3::Database.new("ill.db")
 db.results_as_hash = true
+if sql.empty? 
+  sql = "
+    SELECT illrecord.*, illstatus.fees
+    FROM illrecord
+    INNER JOIN illstatus
+    ON illrecord.illnum = illstatus.illnum
+    WHERE illrecord.illnum = \"#{illnum}\";"
+end
 
-db.execute("SELECT illrecord.*, illstatus.fees
-           FROM illrecord
-           INNER JOIN illstatus
-           ON illrecord.illnum = illstatus.illnum
-           WHERE illrecord.illnum = \"#{illnum}\";") {| row | 
+db.execute(sql) {| row | 
   result = Hash[row.map{|key, value| [key, NKF.nkf('-s', value.to_s)]}]
 
   printf(

@@ -39,7 +39,6 @@ else
 end
 puts "</select><input type=\"submit\" value=\"並び替え\"><input type=\"hidden\" name=\"query\" value=\"#{query}\"></form>"
 
-
 if query.empty?
   sql =  "SELECT illrecord.*, illstatus.status FROM illrecord INNER JOIN illstatus ON illrecord.illnum=illstatus.illnum WHERE illrecord.name like ? OR 1 = 1 ORDER BY date #{order}"
   #sql = "select * from illrecord where name like ? or 1 = 1 order by date #{order}"
@@ -47,14 +46,15 @@ else
   sql =  "SELECT illrecord.*, illstatus.status FROM illrecord INNER JOIN illstatus ON illrecord.illnum=illstatus.illnum WHERE illrecord.name like ? ORDER BY date #{order}"
 end
 
+puts "<form action=\"excsv.cgi\" method=\"get\"><input type=\"submit\" value=\"CSVダウンロード\"><input type=\"hidden\" name=\"sql\" value=\"#{sql}\"></form>"
 
 db = SQLite3::Database.new("ill.db")
 db.results_as_hash = true
 
 puts "<table>"
 puts "<tr><th>ILL状態</th><th>通し番号</th><th>date</th><th>所属</th><th>氏名</th><th>Email</th><th>本・雑誌名</th><th>ISBN/ISSN</th></tr>"
-db.execute(sql, "%#{query}%") {| row | 
- 
+
+db.execute(sql, "%#{query}%") {| row |  
   printf(<<-RECORD, row['status'], row['illnum'], row['date'], row['site'], row['department'], row['name'], row['email'], row['title'], row['illnum'])
 <tr><td>%s</td><td>%s</td><td>%s</td><td>%s, %s</td><td>%s</td><td>%s</td>
 <td><form action="status.cgi" method="get">
