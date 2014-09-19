@@ -10,7 +10,7 @@ require 'nokogiri'
 
 
 def cinii_issn(issn)
-  doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?issn=#{issn}"))
+  doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?issn=#{issn}", proxy: "http://wwwout.nims.go.jp:8888"))
   namespaces = {
     "xmlns" => "http://www.w3.org/2005/Atom", 
     "xmlns:dc" => "http://purl.org/dc/elements/1.1/",
@@ -26,15 +26,15 @@ def cinii_issn(issn)
     result[:title]  = doc.xpath("//xmlns:entry[#{i}]/xmlns:title", namespaces).text
     result[:author] = doc.xpath("//xmlns:entry[#{i}]/xmlns:author/xmlns:name", namespaces).text
     result[:publisher] = doc.xpath("//xmlns:entry[#{i}]/dc:publisher", namespaces).text
-    result[:pubdate] = puts doc.xpath("//xmlns:entry[#{i}]/prism:publicationDate", namespaces).text
+    result[:pubdate] = doc.xpath("//xmlns:entry[#{i}]/prism:publicationDate", namespaces).text
     results << result
     i += 1
   end
-  p results
+  results
 end
 
 def cinii_isbn(isbn)
-  doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?isbn=#{isbn}"))
+  doc = Nokogiri::XML(open("http://ci.nii.ac.jp/books/opensearch/search?isbn=#{isbn}", proxy: "http://wwwout.nims.go.jp:8888"))
 
   namespaces = {
     "xmlns" => "http://www.w3.org/2005/Atom", 
@@ -52,10 +52,11 @@ def cinii_isbn(isbn)
     result[:title]  = doc.xpath("//xmlns:entry[#{i}]/xmlns:title", namespaces).text
     result[:author] = doc.xpath("//xmlns:entry[#{i}]/xmlns:author/xmlns:name", namespaces).text
     result[:publisher] = doc.xpath("//xmlns:entry[#{i}]/dc:publisher", namespaces).text
-    result[:pubdate] = puts doc.xpath("//xmlns:entry[#{i}]/prism:publicationDate", namespaces).text
+    result[:pubdate] = doc.xpath("//xmlns:entry[#{i}]/prism:publicationDate", namespaces).text
     results << result
     i += 1
   end
+  results
 end
 
-cinii_issn("13486780")
+p cinii_issn("13486780")

@@ -5,7 +5,7 @@ require 'cgi'
 require 'library_stdnums'
 print "Content-type: text/html\n\n"
 
-print(<<"HEAD")
+print <<"HEAD"
 <!DOCTYPE html>
 <html lang=\"ja\">
 <head>
@@ -22,7 +22,7 @@ cgi = CGI.new
 order = cgi["order"]
 query = cgi["query"]
 
-print(<<"SEARCH") 
+print <<"SEARCH" 
 	<form action=\"illmanager.cgi\" method=\"get\">
 		<p><input type=\"search\" name=\"query\" size=\"50\" value=\"#{query}\">
 		<input type=\"submit\" value=\"検索\"></p>
@@ -48,41 +48,41 @@ else
 end
 
 
-
 db = SQLite3::Database.new("ill.db")
 db.results_as_hash = true
-db.transaction{
-  puts "<table>"
-  puts "<tr><th>ILL状態</th><th>通し番号</th><th>date</th><th>所属</th><th>氏名</th><th>Email</th><th>本・雑誌名</th><th>ISBN/ISSN</th></tr>"
-  db.execute(sql, "%#{query}%") {| row | 
-  #db.execute(sql) {| row | 
-    printf(<<-RECORD, row['status'], row['illnum'], row['date'], row['site'], row['department'], row['name'], row['email'], row['title'], row['illnum'])
-	<tr><td>%s</td><td>%s</td><td>%s</td><td>%s, %s</td><td>%s</td><td>%s</td>
-	<td><form action="status.cgi" method="get">
-	<input type=\"submit\" value=\"%s\"><input type=\"hidden\" name=\"illnum\" value=\"%s\">
-	</form></td>
-    RECORD
 
-    issn = row['issn']
-    isbn = row['isbn']
-    if issn.empty? && isbn.empty?
-      puts "\t<td>ISBNとISSNがどちらも入力されていません</td>"
-    else
-      if issn.empty?
-        if StdNum::ISBN.valid?(isbn)
-          puts "<td>#{isbn} has a valid checkdigit</td>"
-        else
-          puts "<td><h2>#{isbn}が間違っています<h2/></td>"
-        end
-      elsif isbn.empty?
-        if StdNum::ISSN.valid?(issn)
-          puts "<td>#{issn} has a valid checkdigit</td>"
-        else
-          puts "<td><h2>#{issn}が間違っています<h2/></td>"
-        end
+puts "<table>"
+puts "<tr><th>ILL状態</th><th>通し番号</th><th>date</th><th>所属</th><th>氏名</th><th>Email</th><th>本・雑誌名</th><th>ISBN/ISSN</th></tr>"
+db.execute(sql, "%#{query}%") {| row | 
+ 
+  printf(<<-RECORD, row['status'], row['illnum'], row['date'], row['site'], row['department'], row['name'], row['email'], row['title'], row['illnum'])
+<tr><td>%s</td><td>%s</td><td>%s</td><td>%s, %s</td><td>%s</td><td>%s</td>
+<td><form action="status.cgi" method="get">
+<input type=\"submit\" value=\"%s\"><input type=\"hidden\" name=\"illnum\" value=\"%s\">
+</form></td>
+RECORD
+
+  issn = row['issn']
+  isbn = row['isbn']
+  if issn.empty? && isbn.empty?
+    puts "\t<td>ISBNとISSNがどちらも入力されていません</td>"
+  else
+    if issn.empty?
+      if StdNum::ISBN.valid?(isbn)
+        puts "<td>#{isbn} has a valid checkdigit</td>"
+      else
+        puts "<td><h2>#{isbn}が間違っています</h2></td>"
+      end
+    elsif isbn.empty?
+      if StdNum::ISSN.valid?(issn)
+        puts "<td>#{issn} has a valid checkdigit</td>"
+      else
+        puts "<td><h2>#{issn}が間違っています</h2></td>"
       end
     end
-    puts "</tr>"
-  }
+  end
+  puts "</tr>"
 }
-puts "</table>\n</body>\n</html>"
+puts "</table>\n<p>お問い合わせ先：〒305-0047 茨城県つくば市千現1-2-1
+独立行政法人物質・材料研究機構 企画部門科学情報室
+tel: 029-859-2494 fax: 029-859-2400</p></body>\n</html>"

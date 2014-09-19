@@ -3,8 +3,8 @@
 require 'cgi'
 require 'sqlite3'
 require 'library_stdnums'
-#require './ciniisearch'
-
+require './ciniisearch'
+#require './worldcat'
 
 print "Content-type: text/html\n\n"
 
@@ -37,11 +37,6 @@ db.transaction{
     <body>
     	<a href=\"illmanager.cgi\">受信トレイに戻る</a>
     	<h2>#{row['title']}</h2><hr>
-    	<form action=\"status.cgi\" method=\"get\">
-		<input type=\"text\" name=\"illstatus\" size=\"20\">
-		<input type=\"hidden\" name=\"illnum\" value=\"#{row['illnum']}\">
-		<input type=\"submit\" value=\"状態変更\">
-	</form>
     	<form action="status.cgi" method="get"><select name="illstatus" >
 		<option value="準備中" selected>準備中</option>
 		<option value="未処理">未処理</option>
@@ -59,11 +54,6 @@ db.transaction{
 		<input type=\"hidden\" name=\"illnum\" value=\"#{row['illnum']}\">
 		<input type=\"submit\" value=\"複写料金登録\">
 	</form>
-    	<form action=\"status.cgi\" method=\"get\">
-		<input type=\"text\" name=\"library\" size=\"20\">
-		<input type=\"hidden\" name=\"illnum\" value=\"#{row['illnum']}\">
-		<input type=\"submit\" value=\"図書館登録\">
-	</form>
     FORM
     
     # 図書館登録のセレクトメニュー
@@ -74,8 +64,7 @@ db.transaction{
     puts "\t</select><input type=\"hidden\" name=\"illnum\" value=\"#{row['illnum']}\">\n\t<input type=\"submit\" value=\"図書館登録\">\n\t</form>"
 
     t = Time.new
-    if illstatus.empty?  
-    else 
+    unless illstatus.empty?   
       db.execute "UPDATE illstatus SET status = \"#{illstatus}\" WHERE illnum = \"#{illnum}\""
       db.execute "UPDATE illstatus SET date = \"#{t.to_s}\" WHERE illnum = \"#{illnum}\"" 
     end
@@ -135,6 +124,8 @@ db.transaction{
       if issn.empty?
         if StdNum::ISBN.valid?(isbn)
           puts "<p>#{isbn} has a valid checkdigit</p>"
+          p cinii_isbn(isbn)
+          
           cinii = "http://ci.nii.ac.jp/books/search?isbn=#{isbn}"
           wc = "http://www.worldcat.org/search?q=bn:#{isbn}"
           ndl = "https://ndlopac.ndl.go.jp/F/?func=find-a&find_code=WTYP&request=&request_op=AND&find_code=ISBN&request=#{ndl}&request_op=AND&find_code=WTI&request=&request_op=AND&find_code=WAU&request=&request_op=AND&find_code=WPU&request=&request_op=AND&find_code=CALL&request=&request_op=AND&find_code=&request=&request_op=AND&find_code=&request=&request_op=AND&find_code=&request=&chk_bigram=on&adjacent=N&chk_all=on&chk_fmt_BK=on&chk_fmt_SE=on&chk_fmt_WZ=on&chk_fmt_EL=on&chk_fmt_WK=on&chk_fmt_HA=on&chk_fmt_MP=on&chk_fmt_MI=on&chk_fmt_AC=on&chk_fmt_ZK=on&chk_fmt_KT=on&filter_code_4=WSL&filter_request_4=&filter_code_2=WYR&filter_request_2=&filter_code_3=WYR&filter_request_3=&filter_code_1=WLNT&filter_request_1=&x=75&y=12"
@@ -145,8 +136,8 @@ db.transaction{
       elsif isbn.empty?
         if StdNum::ISSN.valid?(issn)
           puts "<p>#{issn} has a valid checkdigit</p>"
-
-          
+          p cinii_issn(issn)
+          puts "<br>"
           
           cinii = "http://ci.nii.ac.jp/books/search?issn=#{issn}"
           wc = "http://www.worldcat.org/search?q=n2:#{issn}"
